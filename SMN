@@ -1,0 +1,77 @@
+
+# para poder correr cualquier paquete de R en Windows y trabajen juntos es necesario instalar Rtools
+# todo funciona pero es mejor tenerlo instalado
+
+#pasos a seguir.
+
+#   1- bajar la versión desde CRAN https://cran.rstudio.com/bin/windows/Rtools/
+  
+#  2- Instalarla
+
+#   3- hay que crear un archivo especifico para que R pueda acceder a Rtools, para ello corré esta línea desde Rstudio:    
+  
+  writeLines('PATH="${RTOOLS40_HOME}\\usr\\bin;${PATH}"', con = "~/.Renviron")
+
+
+# 4- luego hay que verificar si está bien instalado y tambien desde Rstudio corré esta:  
+  
+  Sys.which("make")
+
+# en la cual tenes que ver que te aparezca este mensaje:   C:\\rtools40\\usr\\bin\\make.exe
+
+
+# y listo!
+  
+ 
+  
+   
+  # PRIMERO SE INTALARÁ EL PAQUETE AGROMET:
+  
+  #este paquete se encuentra publicado en su https://github.com/AgRoMeteorologiaINTA/agromet, todavia no ha sido
+  #publicado en CRAN, por lo tanto cualquier comentario es bienvenido
+  
+  #Para instalar la versión de desarrollo desde GitHub, usá:
+  
+  install.packages("remotes")
+
+# Dependencias de R para agromet
+install.packages(c("sf","remotes", "hms", "kableExtra", "lubridate"), INSTALL_opts=c("--no-help", "--no-html"), repos="http://cran.r-project.org")
+
+# Necesario para la opcion "build_vignettes = TRUE"
+remotes::install_github("Sibada/scPDSI",INSTALL_opts=c("--no-help", "--no-html"))
+
+# build_vignettes = TRUE
+remotes::install_github("AgRoMeteorologiaINTA/agromet", build_vignettes = TRUE)
+
+
+#cualquier cosa me avisan porque estamos a viendo como otros usuarios pueden descargarlo e instalarlo
+
+
+# y listo!!
+
+library(agromet)   # y ven si lo instaló bien
+library(tidyverse)
+
+
+## acá lee el archivo NH
+
+# la función leer_nh del paquete.. te lee el archivo directamente 
+
+datos_estacion <- leer_nh("NOMBRE Y UBICACIÓN DEL ARCHIVO") %>%  # completar_serie(fecha, resolucion = "1 día" ) %>% 
+  select(fecha,codigo_nh,t_max,t_min,precip,hr,heliofania_efec,rad,etp) 
+
+setwd('G:/TRABAJO/CERBAS/Grupo Agrometeorologia/SMN')
+
+datos_estacion <- leer_nh('NH0531.dat') %>%  # completar_serie(fecha, resolucion = "1 día" ) %>% 
+  select(20220515,NH0531,t_max,t_min,precip,hr,heliofania_efec,rad,etp)
+
+datos_olavarria <- leer_nh('NH0531.dat') %>%  # completar_serie(fecha, resolucion = "1 día" ) %>% 
+  select(t_max,t_min,precip,rad,etp)
+
+
+
+install.packages("openxlsx")
+library(openxlsx)
+
+
+write.xlsx(datos_olavarria, "datos_olavarria.xlsx")
